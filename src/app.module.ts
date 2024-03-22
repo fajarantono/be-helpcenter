@@ -12,8 +12,8 @@ import { AllConfigType } from './config/config.type';
 
 // IMPORT MODULE
 import { HomeModule } from './home/home.module';
-import { UsersController } from './users/users.controller';
-import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
+import { CategoryModule } from './category/category.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -51,8 +51,8 @@ import { UsersModule } from './users/users.module';
       inject: [ConfigService],
     }),
     HomeModule,
-    UsersModule,
+    AuthModule,
+    CategoryModule,
   ],
-  controllers: [UsersController],
 })
 export class AppModule {}
