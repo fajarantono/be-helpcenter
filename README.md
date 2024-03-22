@@ -27,6 +27,10 @@ This project needs some dependencies. Let's go install it.
 
 ```bash
 npm install
+
+npm run migration:run
+
+npm run seed:run
 ```
 
 ### Create environment
@@ -37,6 +41,7 @@ Make your own environment file with a copy of `env.example` and adjust values to
 cp .env.example .env
 ```
 
+
 ## Run Project
 
 Finally, Cheers 🍻🍻 !!! you passed all steps.
@@ -44,5 +49,5 @@ Finally, Cheers 🍻🍻 !!! you passed all steps.
 Now you can run the project.
 
 ```bash
-npm run start
+npm run start:dev
 ```
