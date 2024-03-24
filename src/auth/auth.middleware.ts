@@ -22,10 +22,10 @@ export class AuthMiddleware implements NestMiddleware {
         // console.log(authResult.results);
         next();
       } else {
-        res.status(401).json({ success: false, errors: true, message: authResult.message });
+        res.status(401).json({ message: authResult.message });
       }
     } catch (error) {
-      res.status(500).json({ success: false, errors: true, message: 'Internal Server Error' });
+      res.status(500).json({ message: 'Internal Server Error' });
     }
   }
 }

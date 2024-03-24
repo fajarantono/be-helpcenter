@@ -16,7 +16,7 @@ export class AuthGuard implements CanActivate {
 
     if (!token) {
       // No token provided, reject the request
-      response.status(401).json({ success: false, errors: true, message: 'No token provided' });
+      response.status(401).json({ message: 'No token provided' });
       return false;
     }
 

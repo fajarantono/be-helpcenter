@@ -1,34 +1,35 @@
 import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
-  } from 'typeorm';
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
-  @Entity()
-  export class Category {
-    @PrimaryGeneratedColumn()
-    id: number;
-  
-    @Column()
-    name: string;
+@Entity({ name: 'category' })
+export class CategoryEntity {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-    @Column()
-    slug: string;
+  @Column()
+  name: string;
 
-    @Column()
-    icon: string;
-  
-    @Column({ default: true })
-    published?: boolean;
+  @Column()
+  slug: string;
 
-    @Column({ default: true })
-    isActive?: boolean;
-  
-    @CreateDateColumn()
-    createdAt?: Date;
-  
-    @UpdateDateColumn()
-    updatedAt?: Date;
-  }
+  @Column()
+  icon: string;
+
+  @Column({ default: true })
+  published: boolean;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
+
+  @DeleteDateColumn()
+  deleted_at: Date;
+}
