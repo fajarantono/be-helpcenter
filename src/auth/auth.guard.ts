@@ -20,8 +20,8 @@ export class AuthGuard implements CanActivate {
       return false;
     }
 
-    return new Promise<boolean>((resolve, reject) => {
-      this.authMiddleware.use(request, response, (err) => {
+    return new Promise<boolean>((resolve) => {
+      void this.authMiddleware.use(request, response, (err) => {
         if (err) {
           resolve(false); // If there's an error, resolve to false
         } else {

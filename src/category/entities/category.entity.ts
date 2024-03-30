@@ -1,8 +1,10 @@
+import { FileEntity } from '@/files/entities/file.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -18,8 +20,10 @@ export class CategoryEntity {
   @Column()
   slug: string;
 
-  @Column()
-  icon: string;
+  @ManyToOne(() => FileEntity, {
+    eager: true,
+  })
+  icon?: FileEntity | null;
 
   @Column({ default: true })
   published: boolean;

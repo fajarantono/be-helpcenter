@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import databaseConfig from './database/config/database.config';
 import appConfig from './config/app.config';
+import fileConfig from './config/file.config';
 import path from 'path';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -14,11 +15,13 @@ import { AllConfigType } from './config/config.type';
 import { HomeModule } from './home/home.module';
 import { AuthModule } from './auth/auth.module';
 import { CategoryModule } from './category/category.module';
+import { FilesModule } from './files/files.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [databaseConfig, appConfig],
+      load: [databaseConfig, appConfig, fileConfig],
       envFilePath: ['.env'],
     }),
     TypeOrmModule.forRootAsync({
@@ -56,6 +59,7 @@ import { CategoryModule } from './category/category.module';
     HomeModule,
     AuthModule,
     CategoryModule,
+    FilesModule,
   ],
 })
 export class AppModule {}

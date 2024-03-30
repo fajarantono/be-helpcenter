@@ -10,10 +10,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { FileEntity } from './entities/file.entity';
 import { FilesService } from './files.services';
 import { AllConfigType } from '@/config/config.type';
+import { AuthMiddleware } from '@/auth/auth.middleware';
+import { AuthModule } from '@/auth/auth.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([FileEntity]),
+    AuthModule,
     MulterModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -97,6 +100,6 @@ import { AllConfigType } from '@/config/config.type';
     }),
   ],
   controllers: [FilesController],
-  providers: [ConfigModule, ConfigService, FilesService],
+  providers: [ConfigModule, ConfigService, FilesService, AuthMiddleware],
 })
 export class FilesModule {}

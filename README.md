@@ -1,17 +1,21 @@
 # BE HELPCENTER
 
-# Installation
+## Features
+
+- [x] Database ([typeorm](https://www.npmjs.com/package/typeorm)).
+- [x] Seeding.
+- [x] I18N ([nestjs-i18n](https://www.npmjs.com/package/nestjs-i18n)).
+- [x] File uploads. Support local and Amazon S3 drivers.
+- [x] Swagger.
+- [x] E2E and units tests.
+- [x] Docker.
+- [x] CI (Github Actions).
+- [x] Logging
 
 ## Getting Started
 
 Before start, we need to install some packages and tools.
 The recommended version is the LTS version for every tool and package.
-
-It uses below technology:
-
-- NodeJS
-- NPM
-- MongoDB
 
 ### Clone Repo
 
@@ -41,6 +45,53 @@ Make your own environment file with a copy of `env.example` and adjust values to
 cp .env.example .env
 ```
 
+## Links
+
+- Swagger: <http://localhost:3000/docs>
+- Adminer (client for DB): <http://localhost:8080>
+- Maildev: <http://localhost:1080>
+
+## Database utils
+
+Generate migration
+
+```bash
+npm run migration:generate -- src/database/migrations/CreateNameTable
+```
+
+Run migration
+
+```bash
+npm run migration:run
+```
+
+Revert migration
+
+```bash
+npm run migration:revert
+```
+
+Drop all tables in database
+
+```bash
+npm run schema:drop
+```
+
+Run seed
+
+```bash
+npm run seed:run
+```
+
+## Tests
+
+```bash
+# unit tests
+npm run test
+
+# e2e tests
+npm run test:e2e
+```
 
 ## Run Project
 

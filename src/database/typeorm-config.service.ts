@@ -2,10 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
 import { AllConfigType } from 'src/config/config.type';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 @Injectable()
 export class TypeOrmConfigService implements TypeOrmOptionsFactory {
-  constructor(private configService: ConfigService<AllConfigType>) {}
+  constructor(private configService: ConfigService<AllConfigType>) { }
 
   createTypeOrmOptions(): TypeOrmModuleOptions {
     return {
@@ -27,6 +28,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       keepConnectionAlive: true,
       logging:
         this.configService.get('app.nodeEnv', { infer: true }) !== 'production',
+      namingStrategy: new SnakeNamingStrategy(),
       entities: [__dirname + '/../**/*.entity{.ts,.js}'],
       migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
       cli: {
@@ -44,23 +46,23 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
           infer: true,
         })
           ? {
-              rejectUnauthorized: this.configService.get(
-                'database.rejectUnauthorized',
-                { infer: true },
-              ),
-              ca:
-                this.configService.get('database.ca', {
-                  infer: true,
-                }) ?? undefined,
-              key:
-                this.configService.get('database.key', {
-                  infer: true,
-                }) ?? undefined,
-              cert:
-                this.configService.get('database.cert', {
-                  infer: true,
-                }) ?? undefined,
-            }
+            rejectUnauthorized: this.configService.get(
+              'database.rejectUnauthorized',
+              { infer: true },
+            ),
+            ca:
+              this.configService.get('database.ca', {
+                infer: true,
+              }) ?? undefined,
+            key:
+              this.configService.get('database.key', {
+                infer: true,
+              }) ?? undefined,
+            cert:
+              this.configService.get('database.cert', {
+                infer: true,
+              }) ?? undefined,
+          }
           : undefined,
       },
     } as TypeOrmModuleOptions;

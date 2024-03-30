@@ -12,7 +12,7 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { IPaginationOptions } from '@/utils/types/pagination-options';
 import { EntityCondition } from '@/utils/types/entity-condition.type';
 import { NullableType } from '@/utils/types/nullable.type';
-import * as fs from 'fs';
+import { HttpExceptionFilter } from '@/filters/http-exception.filter';
 // import { FilesService } from '@/files/files.services';
 
 @Injectable()
@@ -20,13 +20,9 @@ export class CategoryService {
   constructor(
     @InjectRepository(CategoryEntity)
     private readonly categoryRepository: Repository<CategoryEntity>,
-    // private readonly filesService: FilesService,
-  ) {}
+  ) { }
 
-  async create(
-    createCategoryDto: CreateCategoryDto,
-    iconFileName: string,
-  ): Promise<CategoryEntity> {
+  async create(createCategoryDto: CreateCategoryDto): Promise<CategoryEntity> {
     const slugBase = this.generateSlug(createCategoryDto.name); // Generate slug from name
     let slug = slugBase;
     let counter = 0;
@@ -37,13 +33,12 @@ export class CategoryService {
       slug = `${slugBase}-${counter}`;
     }
 
-    const newCategory = this.categoryRepository.create({
-      name: createCategoryDto.name,
-      slug: slug,
-      icon: iconFileName, // Assuming icon is the file name
-    });
+    // const newCategory = this.categoryRepository.create({
+    //   ...createCategoryDto,
+    //   slug: slug,
+    // });
 
-    return this.categoryRepository.save(newCategory);
+    return this.categoryRepository.save(createCategoryDto);
   }
 
   findAll() {
@@ -52,11 +47,31 @@ export class CategoryService {
 
   findManyWithPagination(
     paginationOptions: IPaginationOptions,
+    search?: string,
   ): Promise<CategoryEntity[]> {
-    return this.categoryRepository.find({
-      skip: paginationOptions.offset,
-      take: paginationOptions.limit,
-    });
+    const offset = (paginationOptions.page - 1) * paginationOptions.limit;
+    const query = this.categoryRepository
+      .createQueryBuilder('category')
+      .leftJoinAndSelect('category.icon', 'icon')
+      .where('category.deleted_at IS NULL')
+      .orderBy('category.created_at', 'DESC')
+      .select([
+        'category.id',
+        'category.name',
+        'category.slug',
+        'category.published',
+        'category.created_at',
+        'icon.id',
+        'icon.path',
+      ]);
+
+    if (search) {
+      query.andWhere('LOWER(category.name) LIKE LOWER(:name)', {
+        name: `%${search}%`,
+      });
+    }
+
+    return query.skip(offset).take(paginationOptions.limit).getMany();
   }
 
   standardCount(): Promise<number> {
@@ -67,30 +82,30 @@ export class CategoryService {
     fields: EntityCondition<CategoryEntity>,
   ): Promise<NullableType<CategoryEntity>> {
     try {
-      const category = await this.categoryRepository.findOne({
-        where: fields,
-      });
-      if (!category) {
-        throw new HttpException(
-          {
-            error: 'Not found',
-            message: 'Category not found',
-            statusCode: HttpStatus.NOT_FOUND,
-          },
-          HttpStatus.NOT_FOUND,
-        );
-      }
+      const query = this.categoryRepository
+        .createQueryBuilder('category')
+        .leftJoinAndSelect('category.icon', 'icon')
+        .select([
+          'category.id',
+          'category.name',
+          'category.slug',
+          'category.published',
+          'category.created_at',
+          'icon.id',
+          'icon.path',
+        ])
+        .where(fields)
+        .andWhere('category.deleted_at IS NULL');
+
+      const category = await query.getOne();
+
       return category;
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
       }
       throw new HttpException(
-        {
-          error: 'Internal server error',
-          message: 'Request invalid',
-          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-        },
+        'Internal server error',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

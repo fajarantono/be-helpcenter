@@ -13,11 +13,13 @@ import {
   Post,
   Put,
   Query,
+  Res,
   UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { AuthGuard } from '@/auth/auth.guard';
+import { ApiResponse } from '@/utils/api-response';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -28,6 +30,10 @@ import { standardPagination } from '@/utils/standard-pagination';
 import { NullableType } from '@/utils/types/nullable.type';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 
+import { FilesService } from '@/files/files.services';
+import { IPaginationInfo } from '@/utils/types/pagination-info.type';
+import { calculatePagination } from '@/utils/calculate-pagination';
+
 @UseGuards(AuthGuard) // Make AuthGuard in here
 @Controller({
   path: 'categories',
@@ -36,22 +42,14 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 @ApiTags('Categories')
 @ApiBearerAuth()
 export class CategoryController {
-  constructor(private readonly categoryService: CategoryService) {}
+  constructor(private readonly categoryService: CategoryService) { }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @UseInterceptors(FileInterceptor('icon'))
   create(
     @Body() createCategoryDto: CreateCategoryDto,
-    @UploadedFile() iconFile: Express.Multer.File,
   ): Promise<CategoryEntity> {
-    if (!iconFile) {
-      throw new BadRequestException('Icon file is required.');
-    }
-
-    const iconFileName = iconFile.filename;
-
-    return this.categoryService.create(createCategoryDto, iconFileName);
+    return this.categoryService.create(createCategoryDto);
   }
 
   @Get()
@@ -59,30 +57,34 @@ export class CategoryController {
   async findAll(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
-    @Query('offset', new DefaultValuePipe(0), ParseIntPipe) offset: number,
-  ): Promise<StandardPaginationResultType<CategoryEntity>> {
+    @Query('search') search?: string,
+  ): Promise<CategoryEntity> {
     if (limit > 50) {
       limit = 50;
     }
 
-    return standardPagination(
-      await this.categoryService.findManyWithPagination({
-        page,
-        limit,
-        offset,
-      }),
-      await this.categoryService.standardCount(),
+    const totalData = await this.categoryService.standardCount();
+    const items = await this.categoryService.findManyWithPagination({
+      page,
+      limit,
+    },
+      search,
     );
 
-    //return this.categoryService.findAll();
+    const paginationInfo = calculatePagination(totalData, page, limit);
+    return ApiResponse.create(null, items, paginationInfo);
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  findOne(
+  async findOne(
     @Param('id') id: CategoryEntity['id'],
   ): Promise<NullableType<CategoryEntity>> {
-    return this.categoryService.findOne({ id });
+    const category = await this.categoryService.findOne({ id });
+
+    const results = category ? category : {};
+
+    return ApiResponse.create(null, results);
   }
 
   // @Patch(':id')
