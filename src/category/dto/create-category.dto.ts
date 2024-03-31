@@ -14,7 +14,7 @@ export class CreateCategoryDto {
   @ApiProperty({ example: 'category' })
   @Transform(slugTransformer)
   @Validate(IsNotExist, ['CategoryEntity', 'slug'], {
-    message: 'Slug Already Exists',
+    message: 'Slug already exists',
   })
   @IsNotEmpty()
   slug: string;
@@ -22,9 +22,9 @@ export class CreateCategoryDto {
   @ApiProperty({ type: () => FileEntity })
   @IsOptional()
   @Validate(IsExist, ['FileEntity', 'id'], {
-    message: 'file Not Exists',
+    message: 'file not exists',
   })
-  icon?: FileEntity | null;
+  icon?: FileEntity;
 
   @ApiProperty({ example: true })
   published?: boolean = true;

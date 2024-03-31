@@ -20,7 +20,10 @@ export class ApiResponse {
     } else {
       res.code = message.code;
       res.message = message.message;
+
+      if (!res.message) delete res.message;
     }
+
     if (!results) delete res.results;
     if (!pagination) delete res.pagination;
 
